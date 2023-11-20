@@ -1,4 +1,11 @@
 <% layout("/Layout/boilerplate") %>
+<style>
+    .img-edit-size{
+        height: 10rem !important;
+        width: 15rem !important;
+    border-radius: 10px;    
+    }
+</style>
 <div class="row">
     <div class="col-8 offset-2">
    
@@ -14,8 +21,8 @@
         <textarea name="listing[description]" class="form-control" required> <%= listing.description %> </textarea></div>
         <br>
         
-        <div class="mb-3" style="width: 20rem;">
-            <img src="<%= listing.image.url%>" />
+        <div class="mb-3" >
+            <img src="<%= listing.image.url%>" class="img-edit-size"/>
            </div> <br>
 
         <div class= "mg-3">

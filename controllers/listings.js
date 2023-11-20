@@ -82,3 +82,4 @@ module.exports.updateListing = async (req,res) => {
     req.flash("success", "Listing Deleted");
     res.redirect("/listings");
 };
+ 
