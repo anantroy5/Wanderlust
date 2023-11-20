@@ -48,17 +48,31 @@ module.exports.createListing = async (req, res, next) => {
 };
 
 module.exports.renderEditForm = async (req, res) => {
-    let {id} = req.params;
+    let {id} = req.params;   
     const listing = await Listing.findById(id);
     res.render("listings/edit.ejs", {listing});
 };
 
 module.exports.updateListing = async (req,res) => {
     let {id} = req.params;
-  
-     await Listing.findByIdAndUpdate(id, {...req.body.listing});
-     req.flash("success", "Listing Updated");
-     res.redirect(`/listings/${id}`);
+     let response = await geocodingClinet.forwardGeocode({
+        query: `${req.body.listing.location},${req.body.listing.country}`,
+        limit: 1
+    }).send()
+    let updateListing = req.body.listing;  
+    let listing = await Listing.findByIdAndUpdate(id,updateListing);
+
+    listing.geometry = response.body.features[0].geometry;   
+    await listing.save();
+
+    if(typeof req.file != "undefined"){ 
+        let url = req.file.path;
+        let filename = req.file.filename;
+        listing.image = {url,filename};
+        await listing.save();
+    }
+    req.flash("success","Listing Updated!")
+    res.redirect(`/listings/${id}`)
   };
 
   module.exports.destoryListing = async (req, res) => {
@@ -68,15 +82,3 @@ module.exports.updateListing = async (req,res) => {
     req.flash("success", "Listing Deleted");
     res.redirect("/listings");
 };
-
-
-// done bas whai ek problem tha kya 
-// shirf ise listing me problem thaa
-// nhi sabhi me problem tha ek baae bata do ge kaya tha
-// pahel apka data.js me gemotery set nhi tha isse liye nhi aa rah tah or listing .js me apne jo reqire kiya tha vo sahi se user nhi kiya dekhiye 
-// ye apka naem same nhi tha kal bhi bolta tha ki jaha ye likha h uska dekhiye nhi to code send kijiye ok or apka 
-// model me listing.js me geometry ka object sahi se nhi tha 
-// ok done or kuch h  data.js me kaha par prlm tha
-
-// didi ne jab location change kiye to old listing me location add nhi tha to location nhi aa rha tha 
-// ye maine group me bhi bataya tha solution 
